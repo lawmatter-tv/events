@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Événements Juridiques</title>
+    <style>
+      * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #e9ecef;
+        }
+
+        .header {
+           background-image: url('https://res.cloudinary.com/donkwo18z/image/upload/v1731984160/20241119_024101_0000_vzdgus.png');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .nav-tabs {
+            background-color: white;
+            padding: 15px 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #495057;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #4e73df; /* Changement de couleur */
+            border-bottom: 3px solid #4e73df; /* Changement de couleur */
+        }
+
+        .section {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .filters {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .event-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .event-title {
+            color: #4e73df; /* Changement de couleur */
+            margin-bottom: 10px;
+        }
+
+        .event-date {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .event-description {
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .event-type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+
+        .type-conference {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .type-formation {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .type-deadline {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        select, input, textarea {
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4e73df; /* Changement de couleur */
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #2196f3; /* Changement de couleur */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: ;
+        }
+
+        .create-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .success-message {
+            background-color: #28a745; /* Changement de couleur */
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .footer {
+            background-color: #2196f3;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+        .footer a {
+            color: #f8f9fa;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Événements Juridiques</h1>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab active" onclick="showSection('events')">Liste des événements</button>
+        <button class="tab" onclick="showSection('create')">Contacter pour créer un événement</button>
+    </div>
+
+    <div id="events-section" class="section active">
+        <div class="filters">
+            <div class="filter-group">
+                <select id="typeFilter">
+                    <option value="tous">Tous les types</option>
+                    <option value="conference">Conférences</option>
+                    <option value="formation">Formations</option>
+                    <option value="deadline">Deadlines</option>
+                </select>
+                <input type="date" id="dateFilter">
+                <button onclick="filterEvents()">Filtrer</button>
+                
+                <section>
+                    <p>AUCUN ÉVÉNEMENT EN COURS</p></section>
+            
+        </div>
+        <div id="eventsContainer"></div>
+    </div>
+
+    <div id="create-section" class="section">
+        <div class="create-form">
+            <div id="successMessage" class="success-message">
+                Votre demande a bien été envoyée !
+            </div>
+            <form id="contactForm" onsubmit="redirectToWhatsApp(event)">
+                <div class="form-group">
+                    <label for="eventTitle">Titre de l'événement</label>
+                    <input type="text" id="eventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventType">Type d'événement</label>
+                    <select id="eventType" required>
+                        <option value="conference">Conférence</option>
+                        <option value="formation">Formation</option>
+                        <option value="deadline">Deadline</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Date</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDescription">Description</label>
+                    <textarea id="eventDescription" rows="4" required></textarea>
+                </div>
+                <button type="submit">Envoyer la demande</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Événements Juridiques | <a href="https://wa.me/2250143692215">Contactez-nous sur WhatsApp</a></p>
+    </div>
+
+    <script>
+        let events = [
+            {
+                title: "Conférence sur le Droit du Numérique",
+                date: "2024-12-15",
+                type: "conference",
+                description: "Une conférence sur les dernières évolutions du droit du numérique et leurs impacts sur les entreprises."
+            },
+            {
+                title: "Formation RGPD",
+                date: "2024-12-20",
+                type: "formation",
+                description: "Formation intensive sur la mise en conformité RGPD pour les entreprises."
+            },
+            {
+                title: "Date limite déclaration fiscale",
+                date: "2024-12-31",
+                type: "deadline",
+                description: "Date limite pour la soumission des déclarations fiscales annuelles."
+            }
+        ];
+        
+            }
+        ];
+
+        function showSection(sectionName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionName + '-section').classList.add('active');
+        }
+
+        function redirectToWhatsApp(event) {
+            event.preventDefault();
+            const title = document.getElementById('eventTitle').value;
+            const type = document.getElementById('eventType').value;
+            const date = document.getElementById('eventDate').value;
+            const description = document.getElementById('eventDescription').value;
+            const message = `Titre: ${title}\nType: ${type}\nDate: ${date}\nDescription: ${description}`;
+            const whatsappUrl = `https://wa.me/2250143692215?text=${encodeURIComponent(message)}`;
+            window.location.href = whatsappUrl;
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('contactForm').reset();
+        }
+
+        function filterEvents() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const filteredEvents = events.filter(event => {
+                const isTypeMatch = (typeFilter === 'tous' || event.type === typeFilter);
+                const isDateMatch = !dateFilter || event.date === dateFilter;
+                return isTypeMatch && isDateMatch;
+            });
+            displayEvents(filteredEvents);
+        }
+
+        function displayEvents(filteredEvents) {
+            const eventsContainer = document.getElementById('eventsContainer');
+            eventsContainer.innerHTML = '';
+
+            if (filteredEvents.length === 0) {
+                eventsContainer.innerHTML = '<p>Aucun événement trouvé.</p>';
+                return;
+            }
+
+            filteredEvents.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.classList.add('event-card');
+
+                const eventTitle = document.createElement('h3');
+                eventTitle.classList.add('event-title');
+                eventTitle.innerText = event.title;
+
+                const eventDate = document.createElement('p');
+                eventDate.classList.add('event-date');
+                eventDate.innerText = `Date: ${event.date}`;
+
+                const eventDescription = document.createElement('p');
+                eventDescription.classList.add('event-description');
+                eventDescription.innerText = event.description;
+
+                const eventType = document.createElement('span');
+                eventType.classList.add('event-type');
+                eventType.classList.add(`type-${event.type}`);
+                eventType.innerText = event.type.charAt(0).toUpperCase() + event.type.slice(1);
+
+                eventCard.appendChild(eventTitle);
+                eventCard.appendChild(eventDate);
+                eventCard.appendChild(eventDescription);
+                eventCard.appendChild(eventType);
+
+                eventsContainer.appendChild(eventCard);
+            });
+        }
+
+        // Initial load to display all events
+        displayEvents(events);
+    </script>
+</body>
+</html>
